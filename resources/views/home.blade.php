@@ -1,19 +1,55 @@
 <x-layout>
     <x-slot:title>
-        Welcome
+        Home Feed
     </x-slot:title>
 
+    <!-- Warble Form -->
+    <div class="card bg-base-100 shadow mt-8">
+        <div class="card-body">
+            <form method="POST" action="/warbles">
+                @csrf
+                <div class="form-control w-full">
+                    <textarea name="message" placeholder="What's on your mind?"
+                        class="textarea textarea-bordered w-full resize-none @error('message') textarea-error @enderror"
+                        rows="4" maxlength="255" required>{{ old('message') }}</textarea>
+
+                    @error('message')
+                        <div class="label">
+                            <span class="label-text-alt text-error">{{ $message }}</span>
+                        </div>
+                    @enderror
+                </div>
+
+                <div class="mt-4 flex items-center justify-end">
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        Warble
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- Feed --}}
     <div class="max-w-2xl mx-auto">
-        @foreach ($warbles as $warble)
-            <div class="card bg-base-100 shadow mt-8">
-                <div class="card-body">
-                    <div>
-                        <div class="font-semibold">{{ $warble['author'] }}</div>
-                        <div class="mt-1">{{ $warble['message'] }}</div>
-                        <div class="text-sm text-gray-500 mt-2">{{ $warble['time'] }}</div>
+        <h1 class="text-3xl font-bold mt-8">Latest warbles</h1>
+
+        <div class="space-y-4 mt-8">
+            @forelse ($warbles as $warble)
+                <x-warble :warble="$warble" />
+            @empty
+                <div class="hero py-12">
+                    <div class="hero-content text-center">
+                        <div>
+                            <svg class="mx-auto h-12 w-12 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
+                                </path>
+                            </svg>
+                            <p class="mt-4 text-base-content/60">No warbles yet. Be the first to warble!</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        @endforeach
+            @endforelse
+        </div>
     </div>
 </x-layout>
