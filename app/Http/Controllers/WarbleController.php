@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Warble;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class WarbleController extends Controller
 {
@@ -40,10 +41,8 @@ class WarbleController extends Controller
             'message.max' => 'Warble must be 255 characters or less.'
         ]);
 
-        Warble::create([
-            'message' => $validated['message'],
-            'user_id' => null,
-        ]);
+        // Use the authenticated user
+        auth()->user()->warbles()->create($validated);
 
         return redirect('/')->with('success', 'Your warble has been posted!');
     }
@@ -61,6 +60,8 @@ class WarbleController extends Controller
      */
     public function edit(Warble $warble)
     {
+        Gate::authorize('update', $warble);
+
         return view('warbles.edit', compact('warble'));
     }
 
@@ -69,6 +70,8 @@ class WarbleController extends Controller
      */
     public function update(Request $request, Warble $warble)
     {
+        Gate::authorize('update', $warble);
+
         // Validate
         $validated = $request->validate([
             'message' => ['required', 'string', 'max:255']
@@ -85,6 +88,8 @@ class WarbleController extends Controller
      */
     public function destroy(Warble $warble)
     {
+        Gate::authorize('delete', $warble);
+
         $warble->delete();
 
         return redirect('/')->with('success', 'Warble deleted!');
